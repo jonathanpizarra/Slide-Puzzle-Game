@@ -1,0 +1,79 @@
+
+<!--
+  Notes : 
+    == You might need to scroll down to see the reference image.
+    == Best played in the app.
+    == The original concept requires you to swipe up, down, left and right. But because of the app's default behavior, I changed it so you just need to click.
+
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        Slide Puzzle Game by Jonathan Pizarra
+    </title>
+    <link rel="stylesheet" href="style.css">  
+
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+  integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+  crossorigin="anonymous"></script>
+                                                                             
+</head>
+<body>
+
+<div id="container">
+<div id="innerBox">
+
+  <div id="creator">
+     Slide Puzzle Game by Jonathan
+  </div>
+  <div id="totalmoves"> Total Moves : 0</div>
+  <div id="moves"> Moves : 0</div>
+  <div id="level"> Level 0 </div>
+  <div id="title"> </div>
+  <div id="box"> </div>
+   
+ <div id="loading">
+   <div id="loadingText"> </div>
+ </div>
+ 
+ <div id="startCont"> 
+   <div id="startIt"><hr>
+   Slide Puzzle Game <hr>
+   <div id="me"> by Jonathan </div>
+   <button id="startBut"> Start Game  </button>
+   </div>
+ </div>
+ 
+ <div id="nextLevel">
+   <div id="congrats">
+     <div id="congratsText"> </div>
+     <button id="nextBut">  </button>
+   </div>
+ </div>
+ 
+<div id="finished">
+  <div id="finishedText">
+    <div id="fText"> You finished the game! <br> Congrats! <br> Thanks for playing.<br>😁 </div>
+    <button id="restartBut"> Restart the Game? </button>
+  </div>
+</div>
+ 
+   <div id="pics">
+     <img id="pic1" src="https://i.imgur.com/BhY6UxK.jpg" >
+     <img id="pic2" src="https://i.imgur.com/pWLS31d.jpg" >
+     <img id="pic3" src="https://i.imgur.com/cL9LmZI.jpg" >
+     <img id="pic4" src="https://i.imgur.com/XJy9SF4.jpg" >
+     <img id="pic5" src="https://i.imgur.com/se177BC.jpg" >
+     <img id="pic6" src="https://i.imgur.com/icCIJK2.jpg" > 
+   </div>
+</div>
+
+</div>
+
+<script src="slide.js"></script>
+</body>
+</html>
