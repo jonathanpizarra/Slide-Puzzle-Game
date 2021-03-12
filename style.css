@@ -76,6 +76,14 @@ body {
 
       }
 
+      .last_cell{
+          visibility: hidden;
+      }
+
+      .really-fast{
+          transition: top 0.05s, left 0.05s;
+      }
+
 
       img {
       height:100px;
