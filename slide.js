@@ -25,7 +25,7 @@ class SlidePuzzle{
         this.size = 40; // should be the same as .cell width and height in css
         this.size = this.n / this.arrSize[this.level-1]
         this.speed = 50;
-        this.random_moves = 1;
+        this.random_moves = 50;
         this.solved_state = "";
         this.current_state = [];
 
@@ -211,7 +211,7 @@ class SlidePuzzle{
         }
         
         this.setInt = setInterval(()=>{
-            if(count++ >= this.random_moves){
+            if(count++ >= this.random_moves * this.level){
                 clearInterval(this.setInt);
                 $("#loading").fadeOut(500);
                 if(this.check_if_solved()) {
