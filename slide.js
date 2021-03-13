@@ -16,27 +16,31 @@ class SlidePuzzle{
                         "https://i.imgur.com/se177BC.jpg",
                         "https://i.imgur.com/icCIJK2.jpg"
                     ];
-        this.arrSize = [3, 4, 5, 5, 6];
+        this.arrSize = [3, 4, 5, 5, 6]; // board sizes for every level
         this.level = 1;
         this.current_level_moves = 0;
         this.moves_per_level = [];
         this.total_moves = 0;
-        this.n = 300;
-        this.size = 40; // should be the same as .cell width and height in css
-        this.size = this.n / this.arrSize[this.level-1]
-        this.speed = 50;
+        this.n = 300; // base width and height for images.
+        this.size = this.n / this.arrSize[this.level-1] // width and height of each piece. 
+        this.speed = 150; // speed of random moves
         this.random_moves = 50;
-        this.solved_state = "";
+        this.solved_state = [];
         this.current_state = [];
 
         this.create_table();
         this.bind_events();
-        // this.create_game();
     }
 
     create_table = ()=>{
+        // resetting previous values
         this.table = $('<table border="0" class="table1"></table>');
-        this.bool = true;
+        this.current_state = [];
+        this.solved_state = [];
+        this.cell_count = 0;
+
+        // populating table with td. 
+        // populating current_state and solved_state.
         for(let i=0; i<this.arrSize[this.level-1]; i++) {
             let row = $('<tr></tr>');
             this.current_state[i] = [];
@@ -44,7 +48,7 @@ class SlidePuzzle{
                 this.cell_count++;
                 let cell = $('<td class="cell" data-xy="' + j + "," + i + '" data-value="' + this.cell_count + '">' + '' + '</td>');
                 cell.css({"top": (this.size*i) + "px", "left": (this.size*j) + "px", "width": this.size, "height": this.size});
-                this.solved_state += this.cell_count;
+                this.solved_state.push(this.cell_count);
                 this.current_state[i].push(this.cell_count);
                 
                 row.append(cell);
@@ -52,12 +56,13 @@ class SlidePuzzle{
             }
             this.table.append(row);
         }
-        this.container.html("").append(this.table);
-        this.last_cell = $(".cell").last();
-        this.last_cell.addClass("last_cell");
-        console.log("in table: moves:", this.current_level_moves)
+
+        this.container.html("").append(this.table); // appending to container
+        this.last_cell = $(".cell").last(); // getting the last cell.
+        this.last_cell.addClass("last_cell"); // making the last cell invisible
     }
 
+    // adding appropriate background image parts for each piece.
     add_image = (c)=>{
         let xy = c.attr("data-xy").split(",");
         let x = xy[0];
@@ -67,41 +72,35 @@ class SlidePuzzle{
         let bottom = this.size * (this.arrSize[this.level-1] - y - 1);
         let left = x * this.size;
 
-        // if(true){
-        //     console.log("top:", top, "right:", right, "bottom:", bottom, "left:", left, "xy:", xy.join(","), "c:", c.attr("data-value"))
-        //     this.bool = false;
-        // }
         c.css("background-image", "url(" + this.images[this.level-1] + ")");
         //c.css("clip-path", "inset(" + top + "px " + right + "px " + bottom + "px " + left + "px )");
         c.css("background-position", " " + (this.n - left) + "px  " + (this.n - top) + "px");
     }
 
+    // click event
     bind_events = ()=>{
         this.cells = $(".cell");
         this.cells.on("click", (e)=>{
-            //console.log($(e.currentTarget).attr("data-xy"), "::", $(e.currentTarget).attr("data-value"))
-            //console.log("last cell:", this.last_cell.attr("data-xy"), "::", this.last_cell.attr("data-value"))
             let swappable = this.check_if_swappable($(e.currentTarget));
             if(swappable){
-                this.swap_cell($(e.currentTarget));
+                this.swap_cell($(e.currentTarget)); // swapping animation and state value swapping
                 $("#moves").html("Moves : " + (++this.current_level_moves));
                 $("#totalmoves").html("Total Moves : "+ (++this.total_moves));
                 
                 if(this.check_if_solved()){
-                    setTimeout(()=>{
+                    //setTimeout(()=>{
                         this.level_up();
-                    },500); 
+                    //},500); 
                 }
             }
         }); 
     }
 
-   
-
     level_up = ()=>{
         this.level++;
         this.moves_per_level.push(this.current_level_moves);
 
+        // if last level is finished.
         if(this.level > this.arrSize.length){
             setTimeout(()=>{
                 $("img").css("display","none");
@@ -118,31 +117,35 @@ class SlidePuzzle{
             },500);
             return;
         }
-
+        // resetting values and adjusting size for new level
         this.current_level_moves = 0;
         this.size = this.n / this.arrSize[this.level-1];
-        this.solved_state = "";
-        this.current_state = [];
         this.cell_count = 0;
 
         $("#congratsText").html("Congratulations! <br> You solved Level " + (this.level-1));
         $("#nextBut").html("Ready for <br> Level " + this.level + " ?");
         $("#nextLevel").fadeIn(500);
-        $("#nextBut").on("click", function(){
-          $("#nextLevel").fadeOut(200);
-          $("#moves").html("Moves : "+ this.current_level_moves);
+        let click = 1;
+        // bind click event to button once then remove it after click
+        $("#nextBut").on("click", ()=>{
+            $("#nextLevel").fadeOut(200);
+            $("#moves").html("Moves : "+ this.current_level_moves);
+            // create new level
+            this.create_table();
+            this.bind_events();
+            this.randomize();
+            $("#nextBut").off(); // removing event right after using it to avoid double triggering which costed me hours of debugging and frustration.
         });
-        this.create_table();
-        this.bind_events();
-
-        this.randomize();
+        
     }
 
     swap_cell = (cell)=>{
+        // swapping cells using data attributes instead of array data.
         let attr = cell.attr("data-xy");
         cell.attr("data-xy", this.last_cell.attr("data-xy"));
         this.last_cell.attr("data-xy", attr);
-
+        
+        // coercing the values into integer to avoid string concatenation.
         let x = +attr.split(",")[0];
         let y = +attr.split(",")[1];
         let value = this.current_state[y][x];
@@ -154,13 +157,11 @@ class SlidePuzzle{
         y = +attr.split(",")[1];
         cell.css({"top":y * this.size, "left":x * this.size});
         this.current_state[y][x] = value;
-        // this.current_level_moves++;
-        // this.total_moves++;
-
-        // console.table(this.current_state);
     }
 
     check_if_swappable = (c)=>{
+        // check using data attribute of clicked element
+        // checking if clicked element is neighbor of last_cell
         let data = c.attr("data-xy").split(",");
         let data_x = data[0];
         let data_y = data[1];
@@ -169,8 +170,12 @@ class SlidePuzzle{
         let last_x = last[0];
         let last_y = last[1];
 
+        // if the clicked cell is not the last_cell
         if(this.last_cell.attr("data-value") != c.attr("data-value")){
+            // if both x values are the same, they are in same column
             if(data_x == last_x){
+                // to determine if they are neighbors, 
+                // the absolute value of their y difference should be 1
                 if(Math.abs(data_y - last_y) == 1){
                     return true;
                 }
@@ -185,59 +190,56 @@ class SlidePuzzle{
         return false;
     }
 
-    check_if_solved = ()=>{
-        if(this.solved_state == this.current_state.flat(2).join("")){
-            return true;
-        }
-        return false;
-    }
-
+    check_if_solved = ()=> this.solved_state.join("-") == this.current_state.flat(2).join("-");
+    
     show_hint = ()=>{
-            $("#pic" + this.level).css("display","block");
+        $("#pic" + this.level).css("display","block");
     }
 
     randomize = ()=>{
+        // speeding up the animation
         $(".cell").css("transition", "top 0.05s, left 0.05s");
-        let count = 0;
+        
+        let count = 0; //
         $("#loadingText").html("Loading Level " + this.level );
         $("#loading").fadeIn(300);
         $("#level").html("Level "+ this.level);
         $("#title").html("'" + this.titles[this.level-1] + "'");
         if(this.level > this.arrSize.length-1) {
            $("#pic" + (this.level+1)).css("display","block");     
-        }
-        else {
+        }else {
            $("#pic" + this.level).css("display","block");
         }
         
-        this.setInt = setInterval(()=>{
-            if(count++ >= this.random_moves * this.level){
-                clearInterval(this.setInt);
-                $("#loading").fadeOut(500);
-                if(this.check_if_solved()) {
-                    this.randomize();
-                }
-                return;
-            }
+        this.animation = setInterval(()=>{
+            
             let neighbors = [];
             let xy = this.last_cell.attr("data-xy").split(",");
             let x = xy[0], y = xy[1];
-            console.log("xy:", xy)
-
+           
             if(+y + 1 < this.arrSize[this.level-1] ) neighbors.push({x:+x, y:+y+1});
             if(+y - 1 >= 0) neighbors.push({x:+x, y:+y-1});
             if(+x - 1 >= 0) neighbors.push({x:+x-1, y:+y});
             if(+x + 1 < this.arrSize[this.level-1]) neighbors.push({x:+x+1, y:+y});
 
             let chosen = neighbors[Math.floor(Math.random() * neighbors.length)];
-            console.log("neigh:",neighbors)
-            console.log("last::", this.last_cell.attr("data-xy"))
-            console.log(chosen)
             chosen = $("td[data-xy='" + chosen.x + "," + chosen.y + "']");
             this.swap_cell(chosen);
-            
-        }, this.speed);
+            count++;
 
+            if(count >= this.random_moves ){
+                this.stop();
+                $("#loading").fadeOut(500);
+                if(this.check_if_solved()) {
+                    this.randomize();
+                }
+                return;
+            }
+        }, this.speed);
+    }
+
+    stop = ()=>{
+        clearInterval(this.animation);
     }
 
 }
