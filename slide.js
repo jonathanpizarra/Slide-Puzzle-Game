@@ -1,8 +1,4 @@
 
-
-let shit = [1,2,3,[4,5],[6,[7,[8,9,10], 1 ], [2,3]]]
-console.log(shit.flat(3).join(""))
-
 class SlidePuzzle{
     constructor(container){
                
@@ -199,7 +195,7 @@ class SlidePuzzle{
     randomize = ()=>{
         // speeding up the animation
         $(".cell").css("transition", "top 0.05s, left 0.05s");
-        
+
         let count = 0; //
         $("#loadingText").html("Loading Level " + this.level );
         $("#loading").fadeIn(300);
